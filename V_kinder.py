@@ -15,7 +15,7 @@ conn = psycopg2.connect(dbname='vkinder_db', user='postgres',
                         password='postgres', host='localhost')
 cursor = conn.cursor()
 
-vk = vk_api.VkApi(token="0a9f035d2f0cc2b690be2c5e1c395238098e26d9e0c0f1259c4dd470fc2225d495b88ab1cea84f1b01f4a")
+vk = vk_api.VkApi(token="<grouptoken>")
 longpoll_vk_ = VkLongPoll(vk)
 
 def write_msg(user_id, message_, attachment_=None):
