@@ -1,4 +1,3 @@
-import sys
 import vk_api
 import json
 import random
@@ -15,7 +14,7 @@ conn = psycopg2.connect(dbname='vkinder_db', user='postgres',
                         password='postgres', host='localhost')
 cursor = conn.cursor()
 
-vk = vk_api.VkApi(token="<grouptoken>")
+vk = vk_api.VkApi(token="<group_token>")
 longpoll_vk_ = VkLongPoll(vk)
 
 def write_msg(user_id, message_, attachment_=None):
@@ -56,8 +55,6 @@ class VkClass:
         self.res_list = []
         self.dict_to_json = {}
 
-        #print(f'\nПривет, {self.user[0]["first_name"]}')
-
     def get_subject_info(self, subject_id=None):
         """
         :param subject_id: uid пользователя,
@@ -70,20 +67,22 @@ class VkClass:
         self.subject_id_info = self.vk.users.get(user_ids=subject_id, fields=self.info_fields)
 
         self.subj_info_dict = Inner.build_subject_info(source_dict=self.subject_id_info)
-        if type(self.subj_info_dict) == str:
+
+        print('**', issubclass(type(self.subj_info_dict), (str, list)))
+        if issubclass(type(self.subj_info_dict), (str, list)) == True:
+            write_msg(self.id, self.subj_info_dict)
+            print('235')
+        else:
+            try:
+                self.subj_friends = (self.vk.friends.get(user_id=self.subj_info_dict['id'])['items'])
+                self.subj_info_dict['friends'] = self.subj_friends
+            except Exception:
+                print('error')
+
+            self.subj_groups = (self.vk.groups.get(user_id=self.subj_info_dict['id'])['items'])
+            self.subj_info_dict['groups'] = self.subj_groups
+
             return self.subj_info_dict
-
-        try:
-            self.subj_friends = (self.vk.friends.get(user_id=self.subj_info_dict['id'])['items'])
-            self.subj_info_dict['friends'] = self.subj_friends
-        except Exception:
-            print('error')
-            sys.exit()
-
-        self.subj_groups = (self.vk.groups.get(user_id=self.subj_info_dict['id'])['items'])
-        self.subj_info_dict['groups'] = self.subj_groups
-
-        return self.subj_info_dict
 
     def make_search_request(self, subject_id=None):
 
@@ -91,7 +90,6 @@ class VkClass:
             subject_id = self.id
 
         self.get_subject_info(subject_id)
-
         self.target_sex = Inner.target_vk_sex(self.subj_info_dict['sex'])
 
         self.target_age = Inner.target_vk_age(self.subj_info_dict['age'])

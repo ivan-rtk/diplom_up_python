@@ -111,6 +111,7 @@ def build_subject_info(source_dict):
                     'games': subj_games,
                     'interests': subj_interests
                 }
+    print(type(subj_info_dict))
     return subj_info_dict
 
 
